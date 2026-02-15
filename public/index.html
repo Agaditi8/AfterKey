@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Vault | Digital Estate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { border-bottom: 3px solid #EAB308; color: black; }
+        .tab-inactive { color: #A1A1AA; }
+        input::placeholder, textarea::placeholder { color: #A1A1AA; }
+    </style>
+</head>
+<body class="bg-[#FCFAFA] text-black min-h-screen">
+
+    <nav class="border-b border-zinc-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
+                <div class="bg-[#EAB308] h-8 w-8 rounded flex items-center justify-center text-black">
+                    <i class="fas fa-key text-sm"></i>
+                </div>
+                <span class="text-xl font-black tracking-tighter uppercase italic">AfterKey</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="user-address" class="text-[10px] font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded"></span>
+                <button id="connectBtn" onclick="connectWallet()" class="px-5 py-2 rounded-full bg-black text-white text-xs font-bold hover:bg-[#EAB308] hover:text-black transition-all uppercase tracking-widest">
+                    Connect Wallet
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="view-landing" class="max-w-4xl mx-auto px-6 py-32 text-center">
+        <span class="text-[10px] font-bold tracking-[0.3em] uppercase text-[#EAB308] mb-4 block">Securing Digital Sovereignty</span>
+        <h1 class="text-7xl md:text-8xl font-black mb-8 leading-none tracking-tighter">
+            Your Assets. <br>Your <span class="underline decoration-[#EAB308] decoration-8">Legacy.</span>
+        </h1>
+        <p class="text-zinc-500 text-lg mb-12 max-w-xl mx-auto leading-relaxed">
+            A decentralized dead man's switch. Your private documents only unlock for loved ones if you fail to check in.
+        </p>
+        <button onclick="connectWallet()" class="px-10 py-5 bg-[#EAB308] text-black rounded-full font-black text-sm uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-xl shadow-yellow-100">
+            Open Your Vault
+        </button>
+    </main>
+
+    <main id="view-vault" class="max-w-7xl mx-auto px-6 py-12 hidden">
+        <div class="flex gap-10 mb-12 border-b border-zinc-100 overflow-x-auto">
+            <button id="btn-tab-assets" onclick="switchTab('assets')" class="pb-4 text-xs font-black uppercase tracking-widest tab-active transition-all whitespace-nowrap">My Assets</button>
+            <button id="btn-tab-shared" onclick="switchTab('shared')" class="pb-4 text-xs font-black uppercase tracking-widest tab-inactive transition-all whitespace-nowrap">Inherited Items</button>
+            <button id="btn-tab-security" onclick="switchTab('security')" class="pb-4 text-xs font-black uppercase tracking-widest tab-inactive transition-all flex items-center gap-2 whitespace-nowrap">
+                Security Profile <span id="pulse-dot" class="w-2 h-2 bg-[#EAB308] rounded-full"></span>
+            </button>
+        </div>
+
+        <div id="tab-assets" class="grid lg:grid-cols-12 gap-12">
+            <div class="lg:col-span-4 space-y-8">
+                <section class="bg-white border border-zinc-100 shadow-sm rounded-2xl p-6">
+                    <h3 class="text-xs font-black uppercase tracking-tighter mb-6 flex items-center gap-2">
+                        <span class="w-1 h-4 bg-[#EAB308]"></span> Seal New Document
+                    </h3>
+                    <div class="space-y-4">
+                        <input id="doc-name" type="text" placeholder="Title (e.g., Property Will)" class="w-full bg-zinc-50 border-none rounded-xl px-4 py-4 text-sm focus:ring-2 ring-[#EAB308] outline-none" />
+                        <textarea id="claim-steps" placeholder="Beneficiary Instructions..." class="w-full bg-zinc-50 border-none rounded-xl px-4 py-4 text-sm h-32 resize-none focus:ring-2 ring-[#EAB308] outline-none"></textarea>
+                        <input id="file-upload" type="file" class="w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:bg-black file:text-white file:border-none border-2 border-dashed border-zinc-100 p-4 rounded-xl hover:border-[#EAB308] transition" />
+                        <div id="upload-status" class="hidden text-center text-[#EAB308] text-[10px] font-black animate-pulse uppercase">Encrypting & Sealing...</div>
+                        <button onclick="handleUpload()" class="w-full py-5 bg-black text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#EAB308] hover:text-black transition shadow-lg">Confirm & Seal</button>
+                    </div>
+                </section>
+
+                <section class="bg-[#EAB308] rounded-2xl p-6 shadow-xl shadow-yellow-100">
+                    <h3 class="text-xs font-black uppercase tracking-tighter mb-4 text-black">Assign Nominee</h3>
+                    <div class="space-y-3">
+                        <input id="selected-doc-id" type="number" placeholder="Doc ID" class="w-full bg-white/50 border-none rounded-xl px-4 py-3 text-sm placeholder:text-black/40 outline-none" />
+                        <input id="beneficiary-address" type="text" placeholder="Nominee Wallet Address 0x..." class="w-full bg-white/50 border-none rounded-xl px-4 py-3 text-sm font-mono placeholder:text-black/40 outline-none" />
+                        <button onclick="grantAccess()" class="w-full py-4 bg-black text-white rounded-xl font-black text-xs uppercase tracking-widest hover:opacity-80 transition">Grant Access</button>
+                    </div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-8">
+                <section class="bg-white border border-zinc-100 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="p-6 border-b border-zinc-50 flex justify-between items-center bg-zinc-50/50">
+                        <h2 class="text-xs font-black uppercase tracking-widest">Your Private Vault</h2>
+                        <button onclick="loadMyDocs()" class="text-zinc-300 hover:text-black transition"><i class="fas fa-sync-alt text-xs"></i></button>
+                    </div>
+                    <div id="my-docs-list" class="divide-y divide-zinc-50"></div>
+                </section>
+            </div>
+        </div>
+
+        <div id="tab-shared" class="hidden max-w-4xl mx-auto">
+            <h2 class="text-4xl font-black mb-8">Legacy <span class="text-[#EAB308]">Released</span></h2>
+            <div id="shared-docs-list" class="grid gap-6"></div>
+        </div>
+
+        <div id="tab-security" class="hidden max-w-2xl mx-auto">
+            <div class="bg-white border border-zinc-100 rounded-[2.5rem] p-10 text-center shadow-2xl shadow-zinc-200/50">
+                <div id="status-badge" class="mb-6"></div>
+                <h2 class="text-3xl font-black mb-2">Dead Man's Switch</h2>
+                
+                <div class="my-10 p-10 bg-zinc-50 rounded-3xl border border-zinc-100">
+                    <p id="phase-label" class="text-[10px] uppercase tracking-widest text-zinc-400 mb-4 font-bold">Time Until Vault Release</p>
+                    <div id="countdown-timer" class="text-6xl font-black tracking-tighter text-black">00:00:00:00</div>
+                </div>
+
+                <div class="space-y-6 text-left">
+                    <button onclick="pingAlive()" class="w-full py-6 bg-[#EAB308] text-black rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-black hover:text-white transition flex items-center justify-center gap-3">
+                        <i class="fas fa-fingerprint text-lg"></i> Check-in to Reset Timer
+                    </button>
+                    
+                    <div class="p-6 rounded-2xl border border-zinc-100">
+                        <label class="block text-[10px] font-black text-zinc-400 uppercase mb-4 tracking-widest">Inactivity Period Trigger</label>
+                        <div class="flex gap-4">
+                            <select id="timeout-select" class="flex-1 bg-zinc-100 border-none rounded-xl px-4 py-3 text-sm font-bold appearance-none">
+                                <option value="30">30 Seconds (Test)</option>
+                                <option value="86400">24 Hours</option>
+                                <option value="2592000">30 Days</option>
+                                <option value="7776000" selected>90 Days</option>
+                                <option value="31536000">1 Year</option>
+                            </select>
+                            <button onclick="updateTimeout()" class="px-8 py-3 bg-black text-white text-[10px] font-black uppercase rounded-xl hover:bg-[#EAB308] hover:text-black transition">Update</button>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl border border-zinc-100 bg-zinc-50/30">
+                        <label class="block text-[10px] font-black text-zinc-400 uppercase mb-4 tracking-widest">Emergency Notification Emails</label>
+                        <div class="flex gap-2 mb-4">
+                            <input id="emergency-email" type="email" placeholder="family@example.com" class="flex-1 bg-white border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-[#EAB308] outline-none shadow-sm" />
+                            <button onclick="addEmergencyContact()" class="px-6 py-3 bg-black text-white text-[10px] font-black uppercase rounded-xl hover:bg-[#EAB308] hover:text-black transition">Add</button>
+                        </div>
+                        <div id="contact-list" class="space-y-2">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
