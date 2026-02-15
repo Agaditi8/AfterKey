@@ -1,5 +1,7 @@
-node_modules/
-artifacts/
-cache/
-ignition/deployments/
-
+/node_modules/
+/artifacts/
+/cache/
+/coverage/
+/ignition/deployments/
+/scripts/
+/public/constants.js
